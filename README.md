@@ -50,15 +50,9 @@ symptom-checker/
 │   ├── .env.example         # Environment variables template
 │   └── symptom_checker.db   # SQLite database (auto-created)
 │
-├── docs/                    # Documentation
-│   ├── API.md              # API documentation
-│   ├── DEPLOYMENT.md       # Deployment guide
-│   └── PROMPT_GUIDE.md     # LLM prompt engineering guide
-│
 ├── tests/                  # Test files
 │   ├── test_api.py
-│   └── test_analyzer.py
-│
+│  
 ├── .gitignore
 ├── README.md
 └── demo-video.mp4          # Demo video
