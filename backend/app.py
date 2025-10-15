@@ -1,12 +1,9 @@
 """
-Healthcare Symptom Checker - Complete Backend API with FREE Google Gemini
+Healthcare Symptom Checker -
 Flask server with Google Gemini AI integration
 
-Author: Kajal Meshram (corrected and updated with hardcoded fallback)
+Author: Kajal Meshram 
 Date: 2025
-
-This is the complete, ready-to-run backend server with enhanced, hardcoded safety fallbacks.
-Make sure you add your GOOGLE_API_KEY in a .env file in this folder.
 """
 
 from flask import Flask, request, jsonify
@@ -24,13 +21,10 @@ import re
 import traceback
 from pydantic import BaseModel, Field
 
-# Load environment variables
 load_dotenv()
 
-# Initialize Flask app
 app = Flask(__name__)
 
-# Enable CORS
 CORS(app, resources={
     r"/api/*": {
         "origins": ["http://localhost:3000", "http://127.0.0.1:3000"],
@@ -39,7 +33,7 @@ CORS(app, resources={
     }
 })
 
-# Rate limiting
+
 limiter = Limiter(
     app=app,
     key_func=get_remote_address,
@@ -47,7 +41,6 @@ limiter = Limiter(
     storage_uri="memory://"
 )
 
-# ==================== PYDANTIC SCHEMAS FOR STRUCTURED OUTPUT ====================
 
 # 1. Define the Condition Structure
 class Condition(BaseModel):
@@ -127,9 +120,7 @@ class SymptomAnalyzer:
         # Configure the genai client
         genai.configure(api_key=api_key)
 
-        # Initialize model and keep as instance attribute
         try:
-            # Add "models/" prefix if missing, which is safer
             full_model_name = model_name if model_name.startswith("models/") else f"models/{model_name}"
             self.model = genai.GenerativeModel(full_model_name)
             print(f"✅ Google Gemini API initialized successfully with model: {full_model_name}")
@@ -148,15 +139,12 @@ class SymptomAnalyzer:
         try:
             print("🤖 Sending request to Gemini AI with Structured Output...")
 
-            # CRITICAL FIX: Use 'config' with response_schema for guaranteed JSON
             response = self.model.generate_content(
                 prompt,
                 config=genai.types.GenerateContentConfig(
-                    # STRUCTURED OUTPUT SETTINGS
                     response_mime_type="application/json",
                     response_schema=SymptomAnalysisSchema, # Pydantic Model
                     
-                    # Generation settings
                     temperature=0.3,
                     top_p=0.8,
                     top_k=40,
@@ -166,7 +154,6 @@ class SymptomAnalyzer:
             
             print("✅ Received structured response from Gemini AI")
             
-            # The response.text should now be clean, valid JSON
             response_text = response.text 
             
             print(f"🧠 Gemini Response (preview): {response_text[:300]}...")
@@ -234,24 +221,19 @@ Now analyze the symptoms and respond ONLY with the requested JSON structure."""
         try:
             response = response.strip()
             
-            # CRITICAL FIX: Direct JSON loading. Regex is no longer needed!
             parsed = json.loads(response)
             
-            # Validate required top-level fields
             if not all(key in parsed for key in ['conditions', 'urgency', 'recommendations']):
                 raise ValueError("Missing required top-level fields in AI response structure")
 
-            # Validate conditions format and correct urgency if needed (though Pydantic does this)
             if isinstance(parsed.get('conditions'), list) and len(parsed['conditions']) > 0:
                 for condition in parsed['conditions']:
                     if not all(k in condition for k in ['name', 'probability', 'description', 'severity']):
                         raise ValueError("Invalid condition format (Missing sub-keys)")
             
-            # Final safety check for urgency
             if parsed.get('urgency') not in ['urgent', 'soon', 'routine']:
                 parsed['urgency'] = 'routine'
             
-            # Return properly formatted analysis
             return {
                 'timestamp': datetime.utcnow().isoformat(),
                 'input': original_data,
@@ -266,140 +248,73 @@ Now analyze the symptoms and respond ONLY with the requested JSON structure."""
             print(f"⚠️ JSON Parse Error: {str(e)}")
             print(f"Raw response: {response[:200]}...")
             
-            # If parsing fails, use fallback
             print("⚠️ Using fallback analysis due to parsing error")
             return self._fallback_analysis(original_data)
-
     
-    # ==================== FALLBACK HELPER FUNCTIONS (HARDCODED) ====================
-    
-    def _extreme_emergency_fallback(self, data: Dict) -> Dict:
-        """Fallback for immediate life-threatening symptoms (e.g., chest pain, stroke signs)."""
-        return {
-            'timestamp': datetime.utcnow().isoformat(),
-            'input': data,
-            'conditions': [{
-                'name': '⚠️ IMMEDIATE MEDICAL ATTENTION REQUIRED',
-                'probability': 'N/A',
-                'description': 'Your symptoms indicate a potentially serious, life-threatening condition that requires immediate professional evaluation.',
-                'severity': 'serious'
-            }],
-            'urgency': 'urgent',
-            'recommendations': [
-                '🚨 Call emergency services (911/112) immediately',
-                '🏥 Go to the nearest emergency room',
-                '❌ Do NOT wait - seek help NOW',
-                '📞 If alone, call someone to help you',
-                '⏱️ Note when symptoms started',
-                '💊 Bring list of current medications if possible'
-            ],
-            'disclaimer': True,
-            'note': 'AI analysis unavailable - Extreme Emergency response activated',
-            'ai_model': 'Fallback System (Extreme)'
-        }
-    
-    def _gastro_safety_fallback(self, data: Dict) -> Dict:
-        input_symptoms = data.get('symptoms', '').lower()
-        
-        # Check for key severe dehydration/emergency gastro signs to set urgency
-        is_severe = any(keyword in input_symptoms for keyword in ['can\'t keep down', 'blood', 'black stools', 'fainting', 'severe weakness', 'no urine'])
-        urgency_level = 'urgent' if is_severe else 'soon'
-
-        return {
-            'timestamp': datetime.utcnow().isoformat(),
-            'input': data,
-            'conditions': [
-                {
-                    "name": "Dehydration (Critical Risk)",
-                    "probability": "High",
-                    "description": "Significant fluid and electrolyte loss from persistent vomiting/diarrhea, leading to weakness and dizziness. Requires immediate focus on rehydration.",
-                    "severity": "serious"
-                },
-                {
-                    "name": "Viral Gastroenteritis ('Stomach Flu')",
-                    "probability": "Moderate",
-                    "description": "Common viral infection of the digestive tract causing vomiting and diarrhea, often resolving within a few days.",
-                    "severity": "moderate"
-                },
-                {
-                    "name": "Food Poisoning (Bacterial or Toxin-related)",
-                    "probability": "Moderate",
-                    "description": "Illness caused by consuming contaminated food or water. Symptoms often start quickly and can be intense.",
-                    "severity": "moderate"
-                },
-                {
-                    "name": "Traveler's Diarrhea (if recent travel)",
-                    "probability": "Moderate",
-                    "description": "A form of gastroenteritis usually caused by bacteria, common after traveling to areas with different sanitation practices.",
-                    "severity": "mild"
-                }
-            ],
-            'urgency': urgency_level,
-            'recommendations': [
-                "Sip, Don't Gulp: Drink small amounts of clear fluids (water, ORS) frequently, even if you can only keep down a few sips.",
-                "Electrolytes are Key: Use Oral Rehydration Solutions (ORS) over plain water or high-sugar sports drinks.",
-                "Rest: Get plenty of rest to allow your body to recover.",
-                "Eat Bland Foods: When vomiting stops, start slowly with bland, easy-to-digest foods (like Bananas, Rice, Applesauce, Toast).",
-                "Avoid: Fruit juice, soda, coffee, alcohol, and fatty/spicy foods.",
-                "🚨 **See a Doctor Immediately if:** persistent dizziness/fainting, no urine for 8+ hours, blood in stool/vomit, or inability to keep down liquids for 24 hours.",
-                "📞 Consult a healthcare provider if vomiting or diarrhea lasts more than 48 hours."
-            ],
-            'disclaimer': True,
-            'note': f'Hardcoded Safety Response (Gastro/Dehydration) - Urgency set to: {urgency_level}',
-            'ai_model': 'Fallback System (Gastro)'
-        }
-    
-    def _safe_routine_fallback(self, data: Dict) -> Dict:
-        """Fallback for general symptoms when AI fails and no specific emergency is detected."""
-        return {
-            'timestamp': datetime.utcnow().isoformat(),
-            'input': data,
-            'conditions': [{
-                'name': 'Professional Medical Evaluation Needed',
-                'probability': 'N/A',
-                'description': 'Your symptoms require in-person evaluation by a qualified healthcare provider for accurate assessment.',
-                'severity': 'unknown'
-            }],
-            'urgency': 'soon',
-            'recommendations': [
-                '📅 Schedule an appointment with your primary care physician',
-                '📝 Write down all your symptoms in detail before the appointment',
-                '⏰ Note when symptoms started and how they have changed',
-                '💊 List all medications and supplements you are currently taking',
-                '📊 Monitor symptoms and record any changes',
-                '🚨 Seek immediate care if symptoms suddenly worsen or become severe',
-            ],
-            'disclaimer': True,
-            'note': 'AI analysis temporarily unavailable - General routine advice provided',
-            'ai_model': 'Fallback System (General)'
-        }
-
-
     def _fallback_analysis(self, data: Dict) -> Dict:
-        """Master fallback function to route based on symptom severity/type."""
+        """Fallback analysis if LLM fails"""
         symptoms_lower = data.get('symptoms', '').lower()
         
-        # 1. CHECK FOR EXTREME EMERGENCIES (Triggers _extreme_emergency_fallback)
         emergency_keywords = [
-            'chest pain', 'chest pressure', 'difficulty breathing', 'shortness of breath',
-            'severe bleeding', 'stroke', 'can\'t move arm', 'face drooping',
-            'seizure', 'convulsion', 'unconscious', 'passed out', 'fainted',
-            'severe headache', 'worst headache', 'coughing blood', 'vomiting blood',
+            'chest pain', 'chest pressure', 'heart attack',
+            'difficulty breathing', "can't breathe", 'shortness of breath',
+            'severe bleeding', 'bleeding heavily', 'blood loss',
+            'stroke', 'can\'t move arm', 'face drooping',
+            'seizure', 'convulsion',
+            'unconscious', 'passed out', 'fainted',
+            'severe headache', 'worst headache',
+            'coughing blood', 'vomiting blood',
             'severe abdominal pain', 'severe stomach pain'
         ]
-        if any(keyword in symptoms_lower for keyword in emergency_keywords):
-            return self._extreme_emergency_fallback(data)
-            
-        # 2. CHECK FOR GASTRO SYMPTOMS (Triggers the detailed hardcoded response)
-        gastro_keywords = ['vomiting', 'diarrhea', 'loose motion']
-        dehydration_keywords = ['weakness', 'dizzy', 'faint']
         
-        if (any(keyword in symptoms_lower for keyword in gastro_keywords) and 
-            any(keyword in symptoms_lower for keyword in dehydration_keywords)):
-            return self._gastro_safety_fallback(data)
-
-        # 3. DEFAULT SAFE FALLBACK (for all other non-emergency failures)
-        return self._safe_routine_fallback(data)
+        is_emergency = any(keyword in symptoms_lower for keyword in emergency_keywords)
+        
+        if is_emergency:
+            return {
+                'timestamp': datetime.utcnow().isoformat(),
+                'input': data,
+                'conditions': [{
+                    'name': '⚠️ IMMEDIATE MEDICAL ATTENTION REQUIRED',
+                    'probability': 'N/A',
+                    'description': 'Your symptoms indicate a potentially serious condition that requires immediate professional evaluation.',
+                    'severity': 'serious'
+                }],
+                'urgency': 'urgent',
+                'recommendations': [
+                    '🚨 Call emergency services (911/112) immediately',
+                    '🏥 Go to the nearest emergency room',
+                    '❌ Do NOT wait - seek help NOW',
+                    '📞 If alone, call someone to help you',
+                    '⏱️ Note when symptoms started',
+                    '💊 Bring list of current medications if possible'
+                ],
+                'disclaimer': True,
+                'note': 'AI analysis unavailable - Emergency response activated',
+                'ai_model': 'Fallback System'
+            }
+        else:
+            return {
+                'timestamp': datetime.utcnow().isoformat(),
+                'input': data,
+                'conditions': [{
+                    'name': 'Professional Medical Evaluation Needed',
+                    'probability': 'N/A',
+                    'description': 'Your symptoms require in-person evaluation by a qualified healthcare provider for accurate assessment.',
+                    'severity': 'unknown'
+                }],
+                'urgency': 'soon',
+                'recommendations': [
+                    '📅 Schedule an appointment with your primary care physician',
+                    '📝 Write down all your symptoms in detail before the appointment',
+                    '⏰ Note when symptoms started and how they have changed',
+                    '💊 List all medications and supplements you are currently taking',
+                    '📊 Monitor symptoms and record any changes',
+                    '🚨 Seek immediate care if symptoms suddenly worsen or become severe',
+                ],
+                'disclaimer': True,
+                'note': 'AI analysis temporarily unavailable - Please consult healthcare provider',
+                'ai_model': 'Fallback System'
+            }
 
 # ==================== INITIALIZE ANALYZER ====================
 
@@ -448,7 +363,6 @@ def health_check():
 @limiter.limit("10 per minute")
 def api_analyze():
     """Main symptom analysis endpoint"""
-    # Handle preflight OPTIONS request
     if request.method == 'OPTIONS':
         return '', 204
     
@@ -532,7 +446,6 @@ def get_history(session_id):
         conn = sqlite3.connect('symptom_checker.db')
         c = conn.cursor()
         
-        # Query last 10 entries for this session
         c.execute('''
             SELECT timestamp, symptoms, conditions, urgency_level, age, gender
             FROM symptom_queries
