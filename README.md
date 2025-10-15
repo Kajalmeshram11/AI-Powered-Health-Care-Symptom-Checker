@@ -214,11 +214,11 @@ Content-Type: application/json
 ```
 ##  Screenshots
 
-![](screenshots/image_1.png)
+![image_1](screenshots/image_1.png)
 
-![](screenshots/image_2.png)
+![image_2](screenshots/image_2.png)
 
-![](screenshots/image_3.png)
+![image_3](screenshots/image_3.png)
 
 
 
