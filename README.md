@@ -63,7 +63,8 @@ symptom-checker/
 ├── README.md
 └── demo-video.mp4          # Demo video
 ```
-
+## DEMO VIDEO
+- https://drive.google.com/file/d/1AxKEP62fTz3s8aGaLZ1pkLwLZxwhR-xh/view?usp=sharing
 ---
 
 ##  Quick Start
@@ -129,89 +130,6 @@ Frontend will open at `http://localhost:3000`
 
 ---
 
-## 📦 Dependencies
-
-### Backend (Python)
-
-```txt
-Flask==3.0.0
-Flask-CORS==4.0.0
-Flask-Limiter==3.5.0
-anthropic==0.25.0
-python-dotenv==1.0.0
-sqlite3
-```
-
-### Frontend (React)
-
-```json
-{
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "lucide-react": "^0.263.1",
-    "axios": "^1.6.0"
-  }
-}
-```
-
----
-
-## 🔌 API Endpoints
-
-### 1. Health Check
-```http
-GET /health
-```
-
-**Response:**
-```json
-{
-  "status": "healthy",
-  "timestamp": "2025-01-15T10:30:00Z"
-}
-```
-
-### 2. Analyze Symptoms
-```http
-POST /api/analyze
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "symptoms": "I have a headache and fever around 101°F",
-  "age": "25",
-  "gender": "male",
-  "duration": "1-3days",
-  "severity": "moderate",
-  "session_id": "unique-session-id"
-}
-```
-
-**Response:**
-```json
-{
-  "timestamp": "2025-01-15T10:30:00Z",
-  "input": { ... },
-  "conditions": [
-    {
-      "name": "Viral Infection",
-      "probability": "High",
-      "description": "Common viral infections can cause fever and headaches",
-      "severity": "mild-moderate"
-    }
-  ],
-  "urgency": "routine",
-  "recommendations": [
-    "Schedule appointment with healthcare provider",
-    "Monitor symptoms",
-    "Stay hydrated"
-  ],
-  "disclaimer": true
-}
-```
 ##  Screenshots
 
 ![image_1](Screenshots/image_1.png)
@@ -231,8 +149,6 @@ Content-Type: application/json
 -  **API Design**: RESTful, well-structured endpoints
 -  **Database**: Query history stored efficiently
 -  **Frontend**: Modern, responsive, user-friendly interface
--  **Error Handling**: Comprehensive error management
--  **Documentation**: Detailed README and code comments
 
 ---
 ##  Contributing
