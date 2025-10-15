@@ -212,6 +212,14 @@ Content-Type: application/json
   "disclaimer": true
 }
 ```
+##  Screenshots
+
+(screenshots/image_1.png)
+
+(screenshots/image_2.png)
+
+(screenshots/image_3.png)
+
 
 
 
