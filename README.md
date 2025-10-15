@@ -3,7 +3,10 @@
 **AI-Powered Preliminary Health Assessment System**
 
 A modern, full-stack healthcare symptom checker that uses Large Language Models (LLMs) to provide educational preliminary assessments of symptoms. Built with React, Flask, and Claude/GPT integration.
-
+---
+## DEMO VIDEO
+- https://drive.google.com/file/d/1AxKEP62fTz3s8aGaLZ1pkLwLZxwhR-xh/view?usp=sharing
+---
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![React](https://img.shields.io/badge/react-18.0+-61dafb.svg)](https://reactjs.org/)
@@ -57,8 +60,6 @@ symptom-checker/
 ├── README.md
 └── demo-video.mp4          # Demo video
 ```
-## DEMO VIDEO
-- https://drive.google.com/file/d/1AxKEP62fTz3s8aGaLZ1pkLwLZxwhR-xh/view?usp=sharing
 ---
 
 ##  Quick Start
