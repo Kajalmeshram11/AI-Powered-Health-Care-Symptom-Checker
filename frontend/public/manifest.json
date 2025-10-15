@@ -1,0 +1,9 @@
+{
+  "short_name": "Symptom Checker",
+  "name": "Healthcare Symptom Checker",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
