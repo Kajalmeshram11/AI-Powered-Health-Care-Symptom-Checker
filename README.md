@@ -2,7 +2,7 @@
 
 **AI-Powered Preliminary Health Assessment System**
 
-A modern, full-stack healthcare symptom checker that uses Large Language Models (LLMs) to provide educational preliminary assessments of symptoms. Built with React, Flask, and Claude/GPT integration.
+A modern, full-stack healthcare symptom checker that uses Large Language Models (LLMs) to provide educational preliminary assessments of symptoms. Built with React, Flask, and Gemini AI integration.
 ---
 ## DEMO VIDEO
 - https://drive.google.com/file/d/1AxKEP62fTz3s8aGaLZ1pkLwLZxwhR-xh/view?usp=sharing
@@ -23,7 +23,7 @@ This application does NOT provide medical advice, diagnosis, or treatment. It is
 
 ##  Features
 
-- **AI-Powered Analysis**: Uses Claude/GPT to analyze symptoms intelligently
+- **AI-Powered Analysis**: Uses Gemini/GPT to analyze symptoms intelligently
 - **Comprehensive Input Form**: Collects symptoms, age, gender, duration, and severity
 - **Smart Recommendations**: Provides condition possibilities and next steps
 - **Urgency Classification**: Categorizes cases as urgent, soon, or routine
