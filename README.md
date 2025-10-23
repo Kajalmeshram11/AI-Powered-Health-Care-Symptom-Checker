@@ -134,17 +134,6 @@ Frontend will open at `http://localhost:3000`
 ![image_3](Screenshots/image_3.png)
 
 
-
-##  Evaluation Criteria Checklist
-
--  **Correctness**: LLM provides accurate, medically sound suggestions
--  **LLM Reasoning Quality**: Prompt engineering ensures good responses
--  **Safety Disclaimers**: Multiple prominent warnings throughout
--  **Code Design**: Clean, modular, well-documented architecture
--  **API Design**: RESTful, well-structured endpoints
--  **Database**: Query history stored efficiently
--  **Frontend**: Modern, responsive, user-friendly interface
-
 ---
 ##  Contributing
 
